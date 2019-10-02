@@ -1,26 +1,52 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 
-const App: React.FC = () => {
+import {Filter} from './Filter/Filter';
+
+export type IControl = 'select' | 'checkbox' | 'colorpicker' | 'rangepicker';
+export type IValue = null | string | boolean;
+
+export type IFilter = {
+  slug: string,
+  name: string,
+  type: IControl,
+  values?: string[],
+  defaultValue: IValue
+}
+
+export type IFilterValues = { [s: string]: IValue };
+
+const filters: Array<IFilter> = [
+  {
+    slug: 'type',
+    name: 'Тип',
+    type: 'select',
+    values: ['Верхняя одежда', 'Белье', 'Штанишки'],
+    defaultValue: null,
+  },
+  {
+    slug: 'stock',
+    name: 'В наличии',
+    type: 'checkbox',
+    defaultValue: false,
+  },
+  {
+    slug: 'calendar',
+    name: 'Дата',
+    type: 'rangepicker',
+    defaultValue: null,
+  }
+];
+
+export function App() {
+
+  function handleChange(dict: IFilterValues): void {
+    console.log(dict);
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Filter filters={filters} onChange={handleChange}/>
     </div>
   );
 }
-
-export default App;
