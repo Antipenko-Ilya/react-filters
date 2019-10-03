@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
+import moment from 'moment';
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
+import { generateData } from './generateData';
 
 import {Filter} from './Filter/Filter';
 
@@ -13,8 +15,8 @@ export type IFilter = {
   values?: string[],
   defaultValue: IValue
 }
-
-export type IFilterValues = { [s: string]: IValue };
+type filterKey = 'type' | 'color' | 'size' | 'inStock' | 'dateReceipt';
+export type IFilterValues = { [s in filterKey]: IValue };
 
 const filters: Array<IFilter> = [
   {
@@ -25,27 +27,50 @@ const filters: Array<IFilter> = [
     defaultValue: null,
   },
   {
-    slug: 'stock',
+    slug: 'inStock',
     name: 'В наличии',
     type: 'checkbox',
     defaultValue: false,
   },
   {
-    slug: 'calendar',
+    slug: 'dateReceipt',
     name: 'Дата',
     type: 'rangepicker',
     defaultValue: null,
   }
 ];
 
-export function App() {
+// https://github.com/marak/Faker.js/
 
+const data = generateData();
+
+function isOK(slug, productFieldValue, filterValue) {
+  if (slug === 'dateReceipt') {
+    const [start, end] = filterValue;
+    return start.isBefore(moment(productFieldValue)) && (!end || end.isAfter(moment(productFieldValue)));
+  }
+  if (slug === 'inStock') {
+    return !filterValue || productFieldValue;
+  }
+  return productFieldValue === filterValue;
+}
+
+export function App() {
+  const [query, setQuery] = useState({});
   function handleChange(dict: IFilterValues): void {
-    console.log(dict);
+    setQuery(dict);
   }
 
+  const filtered = data.filter(product => Object.entries(query as IFilterValues)
+    .every(([key, value]) => isOK(key, product[key as filterKey], value)));
+
+  console.table(filtered.map(({ dateReceipt, ...rest }) => ({ ...rest, date: dateReceipt.format('YYYY.MM.DD') })));
+
+  // https://github.com/bvaughn/react-virtualized
   return (
     <div className="App">
+      {/* <Table list={data.filter(x => x → query)} /> */}
+
       <Filter filters={filters} onChange={handleChange}/>
     </div>
   );
