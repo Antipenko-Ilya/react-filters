@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import moment from 'moment';
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 import { generateData } from './generateData';
-
 import {Filter} from './Filter/Filter';
+import {Content} from './Content/Content';
+import  { Product } from './generateData';
+
 
 export type IControl = 'select' | 'checkbox' | 'colorpicker' | 'rangepicker';
 export type IValue = null | string | boolean;
@@ -61,17 +63,17 @@ export function App() {
     setQuery(dict);
   }
 
-  const filtered = data.filter(product => Object.entries(query as IFilterValues)
+  const filtered : Array<Product> = data.filter(product => Object.entries(query as IFilterValues)
     .every(([key, value]) => isOK(key, product[key as filterKey], value)));
 
-  console.table(filtered.map(({ dateReceipt, ...rest }) => ({ ...rest, date: dateReceipt.format('YYYY.MM.DD') })));
+  const reFiltered = filtered.map(({ dateReceipt, ...rest }) => ({ ...rest, date: dateReceipt.format('YYYY.MM.DD') }))
+  console.log(reFiltered);
 
   // https://github.com/bvaughn/react-virtualized
   return (
     <div className="App">
-      {/* <Table list={data.filter(x => x → query)} /> */}
-
       <Filter filters={filters} onChange={handleChange}/>
+      <Content data={ reFiltered }/>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import moment, { Moment } from 'moment';
 type sizeType = "S" | "M" | "L" | "XL";
 type typesType = "Верхняя одежда" | "Белье" | "Штанишки" | "Ботинки" | "Головные уборы";
 
-type Product = {
+export type Product = {
     id: number;
     name: string;
     type: typesType;
