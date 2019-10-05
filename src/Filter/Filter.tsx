@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import {Moment} from 'moment';
 import {Select} from './Select';
 import {Checkbox} from './Checkbox';
 import {RangePicker} from './Rangepicker';
-import { IFilter, IFilterValues, IControl, IValue } from '../App';
+import { IFilter, IFilterValues, IFilterValue, IControl, IValue } from '../App';
 
 // select checkbox rangepicker colorpicker 
 
 const getControl = (
-  handleChange: (slug: string, value: IValue) => void,
+  handleChange: (slug: string, value: IFilterValue) => void,
   slug: string,
   type: IControl,
-  defaultValue: IValue,
+  defaultValue: IFilterValue,
   values?: string[]
 ) => {
-  const onChange = value => handleChange(slug, value);
+  const onChange = (value: IFilterValue) => handleChange(slug, value);
 
   if (type === 'select') {
     if (values === undefined) throw new Error('invalid select props');
@@ -25,31 +26,34 @@ const getControl = (
     return <Checkbox defaultValue={defaultValue} onChange={onChange} />;
   }
   if (type === 'rangepicker'){
-    return <RangePicker defaultValue={defaultValue} onChange={onChange} />;
+    if (defaultValue === 'boolean' || defaultValue === 'string') throw new Error('invalid rangepicker props');
+    return <RangePicker defaultValue={defaultValue as ([Moment, Moment] | null)} onChange={onChange} />;
   }
 };
 
 interface FilterProps {
   filters: Array<IFilter>;
   onChange: (value: IFilterValues) => void;
+  className: string
 }
 
 export const Filter: React.FunctionComponent<FilterProps> = ({
   onChange,
-  filters
+  filters,
+  className
 }) => {
   const [selectedValue, setSelectedValues] = useState({});
   
-  function handleChange(name: string, value: IValue) {
+  function handleChange(name: string, value: IFilterValue) {
     setSelectedValues(prev => ({ ...prev, [name]: value }));
   }
 
   useEffect(() => {
-    onChange(selectedValue);
+    onChange(selectedValue as IFilterValues);
   }, [selectedValue])
 
   return (
-    <div>
+    <div className={className}>
       {filters.map(({ name, slug, type, values, defaultValue }) => (
         <div>
           {name}

@@ -1,24 +1,25 @@
 import React, { useState } from 'react';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 import { generateData } from './generateData';
 import {Filter} from './Filter/Filter';
 import {Content} from './Content/Content';
 import  { Product } from './generateData';
-
+import style from './App.module.css';
 
 export type IControl = 'select' | 'checkbox' | 'colorpicker' | 'rangepicker';
-export type IValue = null | string | boolean;
+export type IValue = null | string | boolean | Moment
+export type IFilterValue =  null | string | boolean | [Moment, Moment];
 
 export type IFilter = {
   slug: string,
   name: string,
   type: IControl,
   values?: string[],
-  defaultValue: IValue
+  defaultValue: IFilterValue
 }
 type filterKey = 'type' | 'color' | 'size' | 'inStock' | 'dateReceipt';
-export type IFilterValues = { [s in filterKey]: IValue };
+export type IFilterValues = { [s in filterKey]: IFilterValue };
 
 const filters: Array<IFilter> = [
   {
@@ -46,10 +47,11 @@ const filters: Array<IFilter> = [
 
 const data = generateData();
 
-function isOK(slug, productFieldValue, filterValue) {
+function isOK(slug: filterKey, productFieldValue: IValue, filterValue: IFilterValue) {
   if (slug === 'dateReceipt') {
+    if (!Array.isArray(filterValue) || productFieldValue === null || typeof productFieldValue === 'boolean') throw new Error('invalid moment array');
     const [start, end] = filterValue;
-    return start.isBefore(moment(productFieldValue)) && (!end || end.isAfter(moment(productFieldValue)));
+    return (!start || start.isBefore(productFieldValue)) && (!end || end.isAfter(productFieldValue));
   }
   if (slug === 'inStock') {
     return !filterValue || productFieldValue;
@@ -64,16 +66,13 @@ export function App() {
   }
 
   const filtered : Array<Product> = data.filter(product => Object.entries(query as IFilterValues)
-    .every(([key, value]) => isOK(key, product[key as filterKey], value)));
-
-  const reFiltered = filtered.map(({ dateReceipt, ...rest }) => ({ ...rest, date: dateReceipt.format('YYYY.MM.DD') }))
-  console.log(reFiltered);
+    .every(([key, value]) => isOK(key as filterKey, product[key as filterKey], value as IFilterValue)));
 
   // https://github.com/bvaughn/react-virtualized
   return (
-    <div className="App">
-      <Filter filters={filters} onChange={handleChange}/>
-      <Content data={ reFiltered }/>
+    <div className={style.wrapper}>
+      <Filter className={style.left} filters={filters} onChange={handleChange}/>
+      <Content className={style.right} data={filtered}/>
     </div>
   );
 }

@@ -1,11 +1,12 @@
 import React from 'react';
 import  { Product } from '../generateData';
 import 'react-virtualized/styles.css';
-import { List } from 'react-virtualized';
-
+// import { List } from 'react-virtualized';
+import { Column, Table } from 'react-virtualized';
 
 type IProps = {
-    data: Array<any>
+    data: Array<Product>,
+    className: string
 }
 
 type IRowObj = {
@@ -16,29 +17,56 @@ type IRowObj = {
     style: Object
 }
 
-function rowRenderer (row: IRowObj, data: Array<any>){
-    console.log(row);
-    const { key, index, isScrolling, isVisible, style } = row
+export function Content({ data, className }: IProps) {
     return (
-      <div
-        key={key}
-        style={style}
-      >
-        {JSON.stringify(data[index])}
-      </div>
-    )
-  }
+        <div className={className}>
+            <Table
+              width={1000}
+              height={300}
+              headerHeight={20}
+              rowHeight={30}
+              rowCount={data.length}
+              rowGetter={({ index }: ({ index: number })) => data[index]}
+            >
+              <Column
+                label='Id'
+                dataKey='id'
+                width={100}
+              />
+              <Column
+                width={200}
+                label='Name'
+                dataKey='name'
+              />
+               <Column
+                width={200}
+                label='Type'
+                dataKey='type'
+              />
+              <Column
+                width={200}
+                label='Size'
+                dataKey='size'
+              />
 
-export function Content(props: IProps) {
-    return (
-        <div>
-            <List
-                width={300}
-                height={300}
-                rowCount={props.data.length}
-                rowHeight={20}
-                rowRenderer={(row: IRowObj) => rowRenderer(row, props.data)}
-            />
+               <Column
+                width={200}
+                label='Color'
+                dataKey='color'
+              />
+               <Column
+                width={200}
+                label='Date'
+                dataKey='dateReceipt'
+                cellRenderer={({ cellData }) => cellData.format('YYYY.MM.DD')}
+              />
+               <Column
+                width={200}
+                label='In stock'
+                dataKey='inStock'
+                cellRenderer={({ cellData }) => <input type="checkbox" disabled checked={cellData} />}
+              />
+            </Table>    
         </div>
     )
 }

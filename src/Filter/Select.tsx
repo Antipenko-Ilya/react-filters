@@ -1,5 +1,6 @@
 import React from 'react';
 import { Select as AntSelect } from 'antd';
+import style from './Select.module.css';
 
 // https://ant.design/components/select/#header
 
@@ -21,7 +22,7 @@ export const Select: React.FunctionComponent<SelectProps> = ({
   }
   
   return (
-    <AntSelect defaultValue={defaultValue || undefined} className="select" onChange={handleChange}>
+    <AntSelect defaultValue={defaultValue || undefined} className={style.select} onChange={handleChange}>
       {values.map(value => <Option key={value} value={value}>{value}</Option>)}
     </AntSelect>
   );
