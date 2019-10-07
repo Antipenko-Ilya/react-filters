@@ -6,6 +6,9 @@ import {Filter} from './Filter/Filter';
 import {Content} from './Content/Content';
 import  { Product } from './generateData';
 import style from './App.module.css';
+import { filterStore } from './Store';
+import { Provider } from 'mobx-react';
+import { useLocalStore, useObserver, observer } from 'mobx-react';
 
 export type IControl = 'select' | 'checkbox' | 'colorpicker' | 'rangepicker';
 export type IValue = null | string | boolean | Moment
@@ -58,21 +61,15 @@ function isOK(slug: filterKey, productFieldValue: IValue, filterValue: IFilterVa
   }
   return productFieldValue === filterValue;
 }
+// https://github.com/bvaughn/react-virtualized
 
-export function App() {
-  const [query, setQuery] = useState({});
-  function handleChange(dict: IFilterValues): void {
-    setQuery(dict);
-  }
-
-  const filtered : Array<Product> = data.filter(product => Object.entries(query as IFilterValues)
-    .every(([key, value]) => isOK(key as filterKey, product[key as filterKey], value as IFilterValue)));
-
-  // https://github.com/bvaughn/react-virtualized
+const App = () => {
   return (
-    <div className={style.wrapper}>
-      <Filter className={style.left} filters={filters} onChange={handleChange}/>
-      <Content className={style.right} data={filtered}/>
-    </div>
+    <Provider projectStore={filterStore}>
+      <div className={style.wrapper}>
+        <Filter className={style.left} />
+        {/* <Content className={style.right} data={filtered}/> */}
+      </div>
+    </Provider>
   );
 }

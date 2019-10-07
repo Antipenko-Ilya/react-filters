@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocalStore, useObserver, observer,  } from 'mobx-react';
 import {Moment} from 'moment';
 import {Select} from './Select';
 import {Checkbox} from './Checkbox';
@@ -43,23 +44,38 @@ export const Filter: React.FunctionComponent<FilterProps> = ({
   className
 }) => {
   const [selectedValue, setSelectedValues] = useState({});
-  
-  function handleChange(name: string, value: IFilterValue) {
-    setSelectedValues(prev => ({ ...prev, [name]: value }));
-  }
 
-  useEffect(() => {
-    onChange(selectedValue as IFilterValues);
-  }, [selectedValue])
+  const obj = useStores();
+  console.log({obj});
+
+  
+  // function handleChange(name: string, value: IFilterValue) {
+  //   setSelectedValues(prev => ({ ...prev, [name]: value }));
+  // }
+
+  // useEffect(() => {
+  //   onChange(selectedValue as IFilterValues);
+  // }, [selectedValue])
 
   return (
     <div className={className}>
-      {filters.map(({ name, slug, type, values, defaultValue }) => (
+      filter
+      {/* {filters.map(({ name, slug, type, values, defaultValue }) => (
         <div>
           {name}
           {getControl(handleChange, slug, type, defaultValue, values)}
         </div>
-      ))}
+      ))} */}
     </div>
   );
+}
+
+function Person() {
+  const person = useLocalStore(() => ({ name: 'John' }))
+  return useObserver(() => (
+    <div>
+      {person.name}
+      <button onClick={() => (person.name = 'Mike')}>No! I am Mike</button>
+    </div>
+  ))
 }
