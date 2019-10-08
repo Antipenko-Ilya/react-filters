@@ -1,4 +1,7 @@
 .select {
-  width: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 200px;
   /* background: yellow; */
 }

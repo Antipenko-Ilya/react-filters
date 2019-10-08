@@ -7,23 +7,26 @@ import style from './Select.module.css';
 const { Option } = AntSelect;
 
 interface SelectProps {
-  values: string[];
-  defaultValue: string | null;
+  values: any[];
   onChange: (value: string) => void;
+  label: string;
 }
 
 export const Select: React.FunctionComponent<SelectProps> = ({
   values,
-  defaultValue,
-  onChange
+  onChange,
+  label
  }) => {
   function handleChange(value: string) {
     onChange(value);
   }
   
   return (
-    <AntSelect defaultValue={defaultValue || undefined} className={style.select} onChange={handleChange}>
-      {values.map(value => <Option key={value} value={value}>{value}</Option>)}
-    </AntSelect>
+    <div>
+      {label}
+      <AntSelect className={style.select} onChange={handleChange}>
+        {values.map(value => <Option key={value} value={value}>{value}</Option>)}
+      </AntSelect>
+    </div>
   );
 }

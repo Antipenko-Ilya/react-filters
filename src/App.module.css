@@ -1,6 +1,12 @@
 .wrapper {
     display: flex;
+    justify-content: space-between;
 }
 .left {
-    width: 500px;
+   margin-top: 20px;
+   margin-left: 60px;
+}
+.right {
+    margin-top: 20px;
+    margin-right: 20px;
 }
