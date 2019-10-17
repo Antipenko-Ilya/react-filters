@@ -4,7 +4,10 @@ import  { generateData } from '../generateData';
 import 'react-virtualized/styles.css';
 import { useObserver } from 'mobx-react';
 import { Column, Table } from 'react-virtualized';
-import { filterStore, productStore, momentDate, IProduct, IFilterKey, IFilterValue } from '../Store';
+import { momentDate, IFilterKey, IFilterValue } from '../stores/Types';
+import { rootStore } from '../stores/RootStore';
+import { IProduct } from '../stores/ProductStore';
+
 
 type IProps = {
     className: string
@@ -26,16 +29,16 @@ function isOK(slug: string, product: IProduct, filterValue: IFilterValue) {
 
 export function Content({ className }: IProps) {
     useEffect(() => {
-      productStore.startLoading();
+      rootStore.productStore.startLoading();
       setTimeout(() => {
-        productStore.addProducts(generateData());
-        productStore.stopLoading();
+        rootStore.productStore.addProducts(generateData());
+        rootStore.productStore.stopLoading();
       }, 1000)
     }, []);
 
     return useObserver(() => {
 
-      if (productStore.loading) {
+      if (rootStore.productStore.loading) {
         return (
           <div className={className}>
             LOADING
@@ -43,15 +46,15 @@ export function Content({ className }: IProps) {
         );
       }
 
-      const query = filterStore.filters.reduce((acc, { slug, value }) => value === undefined ? acc : ({ ...acc, [slug]: value }), {});
-
-      console.log(query);
-
-      const filtered: IProduct[] = productStore.products.filter(product => Object.entries(query)
+      const query = rootStore.filterStore.filtersMap;
+      //.getFilters();
+      console.log('query', query);
+      const filtered: IProduct[] = rootStore.productStore.products.filter(product => Object.entries(query)
         .every(([key, value]) => isOK(key, product, value as IFilterValue)));
   
       return (
         <div className={className}>
+            {rootStore.filterStore.filters.toString()}
             <Table
               width={1000}
               height={700}
